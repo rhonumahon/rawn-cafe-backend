@@ -1,4 +1,4 @@
-// src/users/schemas/user.schema.ts
+// src/schemas/user.schema.ts
 
 import { Schema, Document } from 'mongoose';
 
@@ -11,6 +11,8 @@ export interface User extends Document {
   card_expiration_date: Date;
   is_active: boolean;
   points: number;
+  rewards: string[]; // Array of redeemed reward IDs
+  redeem_requests: string[]; // Array of requested reward IDs before redemption
 }
 
 export const UserSchema = new Schema({
@@ -22,10 +24,12 @@ export const UserSchema = new Schema({
     enum: ['silver', 'gold', 'platinum'],
     required: true,
   },
-  card_start_date: { type: Date, default: Date.now }, // Automatically set the current date as the start date
+  card_start_date: { type: Date, default: Date.now },
   card_expiration_date: { type: Date, required: true },
   is_active: { type: Boolean, default: true },
   points: { type: Number, default: 0 },
+  rewards: { type: [String], default: [] }, // Initialize the rewards array
+  redeem_requests: { type: [String], default: [] }, // Initialize the redeem_requests array
 });
 
 // Middleware to automatically set the expiration date to 2 years after card start date

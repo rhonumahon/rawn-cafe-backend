@@ -7,7 +7,7 @@ import { Reward } from '../schemas/rewards.schema';
 
 @Injectable()
 export class RewardsService {
-  constructor(@InjectModel(Reward.name) private rewardModel: Model<Reward>) {}
+  constructor(@InjectModel('Reward') private rewardModel: Model<Reward>) {}
 
   // Create a new reward
   async createReward(
