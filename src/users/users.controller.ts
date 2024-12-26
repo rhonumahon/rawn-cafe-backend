@@ -18,8 +18,17 @@ export class UsersController {
   async registerUser(
     @Body('name') name: string,
     @Body('contact_number') contact_number: string,
+    @Body('username') username: string, // New required field
+    @Body('password') password: string, // New required field
+    @Body('email') email?: string, // Optional field
   ) {
-    return this.usersService.registerUser(name, contact_number);
+    return this.usersService.registerUser(
+      name,
+      contact_number,
+      username,
+      password,
+      email,
+    );
   }
 
   // Get all users with selected fields

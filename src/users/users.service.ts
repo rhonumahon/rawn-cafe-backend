@@ -1,5 +1,3 @@
-// src/users/users.service.ts
-
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -94,7 +92,13 @@ export class UsersService {
   }
 
   // Register a user and assign initial points (default: 0)
-  async registerUser(name: string, contact_number: string) {
+  async registerUser(
+    name: string,
+    contact_number: string,
+    username: string,
+    password: string,
+    email?: string,
+  ) {
     const card_number = await this.counterService.getNextCardNumber();
     const points = 0;
     const card_type = this.determineCardType(points);
@@ -106,6 +110,9 @@ export class UsersService {
     const newUser = new this.userModel({
       name,
       contact_number,
+      username,
+      password,
+      email, // Optional email
       card_number,
       card_type,
       points,

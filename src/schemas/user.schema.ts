@@ -13,6 +13,10 @@ export interface User extends Document {
   points: number;
   rewards: string[]; // Array of redeemed reward IDs
   redeem_requests: string[]; // Array of requested reward IDs before redemption
+  username: string;
+  password: string;
+  email?: string; // Optional email
+  is_admin: boolean; // Admin flag
 }
 
 export const UserSchema = new Schema({
@@ -30,6 +34,10 @@ export const UserSchema = new Schema({
   points: { type: Number, default: 0 },
   rewards: { type: [String], default: [] }, // Initialize the rewards array
   redeem_requests: { type: [String], default: [] }, // Initialize the redeem_requests array
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  email: { type: String, required: false }, // Optional email
+  is_admin: { type: Boolean, default: false }, // Default is not admin
 });
 
 // Middleware to automatically set the expiration date to 2 years after card start date
