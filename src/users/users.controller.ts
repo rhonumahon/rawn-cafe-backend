@@ -7,8 +7,15 @@ import {
   Param,
   Get,
   NotFoundException,
+  UseGuards,
+  Put,
+  Delete,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/roles.guard';
+import { Roles } from '../auth/roles/roles.decorator';
+import { UpdateUserDto } from 'src/auth/dto/update-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -18,9 +25,9 @@ export class UsersController {
   async registerUser(
     @Body('name') name: string,
     @Body('contact_number') contact_number: string,
-    @Body('username') username: string, // New required field
-    @Body('password') password: string, // New required field
-    @Body('email') email?: string, // Optional field
+    @Body('username') username: string,
+    @Body('password') password: string,
+    @Body('email') email?: string,
   ) {
     return this.usersService.registerUser(
       name,
@@ -31,14 +38,18 @@ export class UsersController {
     );
   }
 
-  // Get all users with selected fields
+  // Only accessible by super-admin or admin
   @Get()
+  @UseGuards(RolesGuard)
+  @Roles('super-admin', 'admin')
   async getAllUsers() {
     return this.usersService.getAllUsers();
   }
 
-  // Register a user without specifying card type
+  // Accessible by super-admin, admin, or the user themselves
   @Get(':id')
+  @UseGuards(RolesGuard)
+  @Roles('super-admin', 'admin', 'user')
   async getUserById(@Param('id') userId: string) {
     try {
       const user = await this.usersService.getUserById(userId);
@@ -49,16 +60,51 @@ export class UsersController {
   }
 
   @Post('update-points')
+  @UseGuards(RolesGuard)
+  @Roles('super-admin', 'admin')
   async updateUserPoints(@Body('userId') userId: string) {
     return this.usersService.updateUserPoints(userId);
   }
 
-  // Redeem a reward for a user
+  // Redeem a reward (only users with valid reward requests can redeem)
+  @UseGuards(JwtAuthGuard)
   @Post(':user_id/redeem/:reward_id')
   async redeemReward(
     @Param('user_id') userId: string,
     @Param('reward_id') rewardId: string,
   ) {
     return this.usersService.redeemReward(userId, rewardId);
+  }
+
+  // Update a user's details
+  @Put(':user_id')
+  @UseGuards(RolesGuard)
+  @Roles('super-admin')
+  async updateUser(
+    @Param('user_id') userId: string,
+    @Body() updateData: Partial<UpdateUserDto>,
+  ) {
+    try {
+      const updatedUser = await this.usersService.updateUser(
+        userId,
+        updateData,
+      );
+      return updatedUser;
+    } catch (error) {
+      throw new NotFoundException(error.message); // If user is not found, throw a 404 error
+    }
+  }
+
+  // Delete a user
+  @Delete(':user_id')
+  @UseGuards(RolesGuard)
+  @Roles('super-admin')
+  async deleteUser(@Param('user_id') userId: string) {
+    try {
+      await this.usersService.deleteUser(userId);
+      return { message: 'User deleted successfully' };
+    } catch (error) {
+      throw new NotFoundException(error.message); // If user is not found, throw a 404 error
+    }
   }
 }

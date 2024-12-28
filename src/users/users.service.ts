@@ -4,15 +4,27 @@ import { Model } from 'mongoose';
 import { User } from '../schemas/user.schema';
 import { CounterService } from '../counter/counter.service';
 import { RewardsService } from 'src/rewards/rewards.service';
+import * as bcrypt from 'bcrypt';
+import { UpdateUserDto } from 'src/auth/dto/update-user.dto';
 // import { Reward } from '../schemas/rewards.schema'; // Import the Reward schema
 
 @Injectable()
 export class UsersService {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  findById(_sub: any) {
+    throw new Error('Method not implemented.');
+  }
   constructor(
     @InjectModel('User') private userModel: Model<User>,
     private counterService: CounterService,
     private rewardsService: RewardsService, // Inject RewardsService to get reward details
   ) {}
+
+  async findByUsername(username: string): Promise<User | null> {
+    const user = await this.userModel.findOne({ username }).exec();
+    console.log('User found in DB:', user); // Log the fetched user object
+    return user;
+  }
 
   // Fetch all users with selected fields and update is_active if card is expired
   async getAllUsers() {
@@ -106,12 +118,12 @@ export class UsersService {
     const card_start_date = new Date();
     const card_expiration_date = new Date(card_start_date);
     card_expiration_date.setFullYear(card_expiration_date.getFullYear() + 2);
-
+    const hashedPassword = await bcrypt.hash(password, 10); // Hash password before saving
     const newUser = new this.userModel({
       name,
       contact_number,
       username,
-      password,
+      password: hashedPassword,
       email, // Optional email
       card_number,
       card_type,
@@ -124,6 +136,25 @@ export class UsersService {
     });
 
     return newUser.save();
+  }
+
+  // Update user
+  async updateUser(userId: string, updateData: Partial<UpdateUserDto>) {
+    const user = await this.userModel.findByIdAndUpdate(userId, updateData, {
+      new: true, // Return the updated user
+    });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+    return user;
+  }
+
+  // Delete user
+  async deleteUser(userId: string) {
+    const user = await this.userModel.findByIdAndDelete(userId).exec();
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
   }
 
   // Automatically increment the user's points and recalculate card type
