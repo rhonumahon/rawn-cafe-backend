@@ -47,10 +47,10 @@ export class UsersController {
   }
 
   // Accessible by super-admin, admin, or the user themselves
-  @Get(':id')
+  @Get(':user_id')
   @UseGuards(RolesGuard)
   @Roles('super-admin', 'admin', 'user')
-  async getUserById(@Param('id') userId: string) {
+  async getUserById(@Param('user_id') userId: string) {
     try {
       const user = await this.usersService.getUserById(userId);
       return user;
