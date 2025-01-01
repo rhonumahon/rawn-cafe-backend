@@ -20,7 +20,7 @@ export class AuthController {
       loginDto.password,
     );
     if (!user) {
-      return { error: 'User not found!' };
+      return { error: 'The username or password you’ve entered is incorrect!' };
     }
 
     return this.authService.login(user);
