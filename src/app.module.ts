@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { RewardsModule } from './rewards/rewards.module';
 import { AuthModule } from './auth/auth.module';
+import { HttpsProxyAgent } from 'https-proxy-agent';
 
 @Module({
   imports: [
@@ -13,12 +14,23 @@ import { AuthModule } from './auth/auth.module';
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('MONGO_URI'), // Use environment variable for URI
-        useNewUrlParser: true, // Ensure MongoDB driver uses the latest parser
-        useUnifiedTopology: true, // Ensure MongoDB driver uses the latest topology engine
-        family: 4, // Forces the use of IPv4 (value 4 means IPv4, 6 means IPv6)
-      }),
+      useFactory: async (configService: ConfigService) => {
+        const mongoUri = configService.get<string>('MONGO_URI'); // MongoDB connection string
+        const proxyUrl = configService.get<string>('QUOTAGUARDSHIELD_URL'); // QuotaGuard proxy URL
+
+        // Set up proxy agent
+        const proxyAgent = new HttpsProxyAgent(proxyUrl);
+
+        return {
+          uri: mongoUri,
+          useNewUrlParser: true, // Ensure MongoDB driver uses the latest parser
+          useUnifiedTopology: true, // Ensure MongoDB driver uses the latest topology engine
+          family: 4, // Forces the use of IPv4
+          driverOptions: {
+            agent: proxyAgent, // Use proxy agent for requests
+          },
+        };
+      },
       inject: [ConfigService],
     }),
     UsersModule,
