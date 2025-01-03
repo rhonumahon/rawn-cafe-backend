@@ -15,8 +15,8 @@ import { AuthModule } from './auth/auth.module';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         uri: configService.get<string>('MONGO_URI'), // Use environment variable for URI
-        useNewUrlParser: true, // Ensure MongoDB driver uses the latest parser
-        useUnifiedTopology: true, // Ensure MongoDB driver uses the latest topology engine
+        serverSelectionTimeoutMS: 5000, // Adjust the timeout as needed
+        socketTimeoutMS: 45000, // Adjust socket timeout
         family: 4, // Forces the use of IPv4 (value 4 means IPv4, 6 means IPv6)
       }),
       inject: [ConfigService],
