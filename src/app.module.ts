@@ -24,7 +24,8 @@ import { HttpsProxyAgent } from 'https-proxy-agent';
         return {
           uri: mongoUri,
           family: 4, // Forces the use of IPv4
-          driverOptions: {
+          // Directly include the proxy agent in the options object
+          options: {
             agent: proxyAgent, // Use proxy agent for requests
           },
         };
