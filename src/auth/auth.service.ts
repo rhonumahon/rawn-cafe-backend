@@ -1,5 +1,5 @@
 // src/auth/auth.service.ts
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
@@ -7,20 +7,30 @@ import { UsersService } from 'src/users/users.service';
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
-    private jwtService: JwtService,
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
   ) {}
 
   // Validate user credentials
   async validateUser(username: string, password: string): Promise<any> {
-    const user = await this.usersService.findByUsername(username); // You must implement this in the Users service
-    console.log('user :', user);
-    if (user && (await bcrypt.compare(password, user.password))) {
+    try {
+      const user = await this.usersService.findByUsername(username); // Ensure findByUsername is implemented
+      if (!user) {
+        throw new UnauthorizedException('Invalid username or password');
+      }
+
+      const isPasswordMatching = await bcrypt.compare(password, user.password);
+      if (!isPasswordMatching) {
+        throw new UnauthorizedException('Invalid username or password');
+      }
+
+      // Remove password from the user object before returning
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password: pass, ...result } = user.toObject(); // Remove password from user object
+      const { password: _, ...result } = user.toObject();
       return result;
+    } catch (error) {
+      throw new UnauthorizedException(error.message);
     }
-    return null;
   }
 
   // Login and generate JWT
