@@ -23,8 +23,6 @@ import { HttpsProxyAgent } from 'https-proxy-agent';
 
         return {
           uri: mongoUri,
-          useNewUrlParser: true, // Ensure MongoDB driver uses the latest parser
-          useUnifiedTopology: true, // Ensure MongoDB driver uses the latest topology engine
           family: 4, // Forces the use of IPv4
           driverOptions: {
             agent: proxyAgent, // Use proxy agent for requests
