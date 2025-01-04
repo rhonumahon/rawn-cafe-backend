@@ -38,7 +38,7 @@ async function bootstrap() {
   // Enable CORS (this allows communication with your frontend)
   app.enableCors({
     origin: [
-      'https://rawncafe-web-bbc9c61e9cb6.herokuapp.com',
+      'https://rawn-cafe-backend-631bf37fe97e.herokuapp.com',
       'https://rawncafe.com', // Update to your production domain
     ], // Allow requests from the Angular app
     methods: 'GET,POST,PUT,DELETE', // Allow these HTTP methods
