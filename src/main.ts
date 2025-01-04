@@ -39,18 +39,18 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       'https://rawncafe-web-bbc9c61e9cb6.herokuapp.com',
-      'https://rawncafe.com',
+      'https://rawncafe.com', // Update to your production domain
     ], // Allow requests from the Angular app
     methods: 'GET,POST,PUT,DELETE', // Allow these HTTP methods
     allowedHeaders: 'Content-Type,Authorization', // Allow these headers
   });
 
-  // Serve static files from the Angular app
-  app.use(express.static(join(__dirname, '..', 'dist/rawncafe-web')));
+  // Serve static files from the Angular app in the 'frontend' folder
+  app.use(express.static(join(__dirname, '..', 'frontend')));
 
-  // Handle fallback routes for Angular
+  // Handle fallback routes for Angular (if no API route matches)
   app.use('*', (req, res) => {
-    res.sendFile(join(__dirname, '..', 'dist/rawncafe-web', 'index.html'));
+    res.sendFile(join(__dirname, '..', 'frontend', 'index.html'));
   });
 
   // Start the application
