@@ -2,6 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as mongoose from 'mongoose';
 import { HttpsProxyAgent } from 'https-proxy-agent'; // Correct import for the class
+import { join } from 'path';
+import * as express from 'express';
 
 mongoose.set('debug', true);
 
@@ -35,12 +37,26 @@ async function bootstrap() {
 
   // Enable CORS (this allows communication with your frontend)
   app.enableCors({
-    origin: 'https://rawncafe-web-bbc9c61e9cb6.herokuapp.com', // Allow requests from the Angular app running on localhost:4200
+    origin: [
+      'https://rawncafe-web-bbc9c61e9cb6.herokuapp.com',
+      'https://rawncafe.com',
+    ], // Allow requests from the Angular app
     methods: 'GET,POST,PUT,DELETE', // Allow these HTTP methods
     allowedHeaders: 'Content-Type,Authorization', // Allow these headers
   });
 
+  // Serve static files from the Angular app
+  app.use(express.static(join(__dirname, '..', 'dist/rawncafe-web')));
+
+  // Handle fallback routes for Angular
+  app.use('*', (req, res) => {
+    res.sendFile(join(__dirname, '..', 'dist/rawncafe-web', 'index.html'));
+  });
+
   // Start the application
   await app.listen(process.env.PORT ?? 3000);
+  console.log(
+    `Application is running on: http://localhost:${process.env.PORT ?? 3000}`,
+  );
 }
 bootstrap();
