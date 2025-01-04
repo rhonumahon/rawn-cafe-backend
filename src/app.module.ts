@@ -5,6 +5,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { RewardsModule } from './rewards/rewards.module';
 import { AuthModule } from './auth/auth.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -24,6 +26,12 @@ import { AuthModule } from './auth/auth.module';
     UsersModule,
     RewardsModule,
     AuthModule,
+
+    // Serve static files (Angular build) and exclude API routes
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'client', 'dist'), // Path to your Angular build folder
+      exclude: ['/api/*'], // Exclude API routes from static serving
+    }),
   ],
 })
 export class AppModule {}
