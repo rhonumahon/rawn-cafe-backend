@@ -10,6 +10,7 @@ mongoose.set('debug', true);
 async function bootstrap() {
   console.log('(process.env.MONGO_URI :', process.env.MONGO_URI);
 
+
   // Check if the Quotaguard URL is provided in the environment variables
   const quotaguardUrl = process.env.QUOTAGUARDSHIELD_URL;
   if (quotaguardUrl) {
@@ -47,6 +48,7 @@ async function bootstrap() {
 
   // Handle Angular routes fallback
   app.use((req, res, next) => {
+    console.log(`Request URL: ${req.originalUrl}`);
     if (req.originalUrl.startsWith('/api')) {
       // Allow API requests to proceed
       return next();
