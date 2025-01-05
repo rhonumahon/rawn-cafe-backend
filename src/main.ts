@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as mongoose from 'mongoose';
-import { HttpsProxyAgent } from 'https-proxy-agent'; // Correct import for the class
+import { HttpsProxyAgent } from 'https-proxy-agent';
 import { join } from 'path';
 import * as express from 'express';
 
@@ -13,15 +13,10 @@ async function bootstrap() {
   // Check if the Quotaguard URL is provided in the environment variables
   const quotaguardUrl = process.env.QUOTAGUARDSHIELD_URL;
   if (quotaguardUrl) {
-    // Create an instance of HttpsProxyAgent with the Quotaguard URL
     const agent = new HttpsProxyAgent(quotaguardUrl);
-
-    // Apply this proxy agent globally to Axios or any HTTP request library
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const axios = require('axios');
     axios.defaults.httpAgent = agent;
     axios.defaults.httpsAgent = agent;
-
     console.log('Using Quotaguard proxy:', quotaguardUrl);
   }
 
@@ -32,37 +27,34 @@ async function bootstrap() {
     console.error('Mongoose connection error:', error);
   }
 
-  // Initialize NestJS app
   const app = await NestFactory.create(AppModule);
 
-  // Enable CORS (this allows communication with your frontend)
+  // Enable CORS
   app.enableCors({
     origin: [
       'https://rawn-cafe-backend-631bf37fe97e.herokuapp.com',
-      'https://rawncafe.com', // Update to your production domain
+      'https://rawncafe.com',
     ],
     methods: 'GET,POST,PUT,DELETE',
     allowedHeaders: 'Content-Type,Authorization',
   });
 
-  // Serve static files from the Angular app in the 'frontend' folder
+  // Serve Angular static files
   app.use(express.static(join(__dirname, '..', 'frontend')));
 
-  // Explicitly prefix API routes with '/api'
+  // Set global prefix for API routes
   app.setGlobalPrefix('api');
 
-  // Handle Angular routes (fallback for non-API routes)
+  // Handle Angular routes fallback
   app.use((req, res, next) => {
     if (req.originalUrl.startsWith('/api')) {
-      // Let API routes continue processing
-      next();
-    } else {
-      // Send other routes to Angular's index.html
-      res.sendFile(join(__dirname, '..', 'frontend', 'index.html'));
+      // Allow API requests to proceed
+      return next();
     }
+    // Fallback for Angular routes
+    res.sendFile(join(__dirname, '..', 'frontend', 'index.html'));
   });
 
-  // Start the application
   await app.listen(process.env.PORT ?? 3000);
   console.log(
     `Application is running on: http://localhost:${process.env.PORT ?? 3000}`,
