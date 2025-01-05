@@ -46,11 +46,11 @@ async function bootstrap() {
   });
 
   // Serve static files from the Angular app in the 'frontend' folder
-  app.use(express.static(join(__dirname, '..', 'frontend')));
+  app.use(express.static(join(__dirname, '..', 'dist', 'frontend')));
 
   // Handle fallback routes for Angular (if no API route matches)
   app.use('*', (req, res) => {
-    res.sendFile(join(__dirname, '..', 'frontend', 'index.html'));
+    res.sendFile(join(__dirname, '..', 'dist', 'frontend', 'index.html'));
   });
 
   // Start the application
