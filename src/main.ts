@@ -37,6 +37,7 @@ async function bootstrap() {
       'https://rawncafe.com',
       'https://www.rawncafe.com',
       'http://www.rawncafe.com',
+      'http://localhost:4200'
     ],
     methods: 'GET,POST,PUT,DELETE',
     allowedHeaders: 'Content-Type,Authorization',
