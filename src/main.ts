@@ -33,8 +33,9 @@ async function bootstrap() {
   // Enable CORS
   app.enableCors({
     origin: [
-      'https://rawn-cafe-backend-631bf37fe97e.herokuapp.com',
+      'https://rawncafe-3d7528568e5c.herokuapp.com/',
       'https://rawncafe.com',
+      'http://rawncafe.com',
       'https://www.rawncafe.com',
       'http://www.rawncafe.com',
       'http://localhost:4200'
