@@ -35,10 +35,8 @@ async function bootstrap() {
     origin: [
       'https://rawncafe-3d7528568e5c.herokuapp.com/',
       'https://rawncafe.com',
-      'http://rawncafe.com',
       'https://www.rawncafe.com',
-      'http://www.rawncafe.com',
-      'http://localhost:4300'
+      'http://localhost:4362'
     ],
     methods: 'GET,POST,PUT,DELETE',
     allowedHeaders: 'Content-Type,Authorization',
