@@ -93,14 +93,26 @@ export class UsersService {
   }
 
   // Determine the card type based on points
-  private determineCardType(points: number): 'silver' | 'gold' | 'platinum' {
-    if (points < 20) {
-      return 'silver';
-    } else if (points >= 20 && points <= 49) {
-      return 'gold';
-    } else {
-      return 'platinum';
-    }
+  private determineCardType(
+    points: number,
+  ): 'silver' | 'gold' | 'platinum' | 'emerald' | 'sapphire' | 'ruby' {
+    const tiers = [
+      { threshold: 0, type: 'silver' as const },
+      { threshold: 11, type: 'gold' as const },
+      { threshold: 21, type: 'platinum' as const },
+      { threshold: 31, type: 'emerald' as const },
+      { threshold: 41, type: 'sapphire' as const },
+      { threshold: 51, type: 'ruby' as const },
+    ];
+
+    return (tiers.filter((tier) => points >= tier.threshold).pop()?.type ??
+      'silver') as
+      | 'silver'
+      | 'gold'
+      | 'platinum'
+      | 'emerald'
+      | 'sapphire'
+      | 'ruby';
   }
 
   // Register a user and assign initial points (default: 0)

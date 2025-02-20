@@ -6,7 +6,7 @@ export interface User extends Document {
   name: string;
   contact_number: string;
   card_number: number;
-  card_type: 'silver' | 'gold' | 'platinum';
+  card_type: 'silver' | 'gold' | 'platinum' | 'emerald' | 'sapphire' | 'ruby';
   card_start_date: Date;
   card_expiration_date: Date;
   is_active: boolean;
@@ -25,7 +25,7 @@ export const UserSchema = new Schema({
   card_number: { type: Number, required: true, unique: true },
   card_type: {
     type: String,
-    enum: ['silver', 'gold', 'platinum'],
+    enum: ['silver', 'gold', 'platinum', 'emerald', 'sapphire', 'ruby'],
     required: true,
   },
   card_start_date: { type: Date, default: Date.now },
